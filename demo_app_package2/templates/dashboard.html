@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remote Monitoring Dashboard</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .alert { color: red; font-weight: bold; }
+        .log { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Cell Tower Monitoring Dashboard</h1>
+    <img src="/static/cctv.jpg" alt="CCTV Feed" width="400"><br><br>
+    <button onclick="triggerSensor('motion')">Trigger Motion Sensor</button>
+    <button onclick="triggerSensor('vibration')">Trigger Vibration Sensor</button>
+    <div id="alertBox" class="alert"></div>
+    <div class="log">
+        <h3>Incident Log</h3>
+        <ul id="logList">
+            {% for incident in incidents %}
+                <li>{{ incident.timestamp }} - {{ incident.sensor }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <script>
+        function triggerSensor(sensor) {
+            fetch('/trigger', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sensor: sensor})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("alertBox").innerText = "Alert: " + data.incident.sensor + " detected!";
+                setTimeout(() => { document.getElementById("alertBox").innerText = ""; }, 3000);
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
